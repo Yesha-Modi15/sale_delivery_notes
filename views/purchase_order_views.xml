@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <record id="purchase_order_tree_inherit_deliver_to" model="ir.ui.view">-->
+<!--        <field name="name">purchase.order.list.inherit.deliver.to</field>-->
+<!--        <field name="model">purchase.order</field>-->
+<!--        <field name="inherit_id" ref="purchase.purchase_order_tree"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='partner_id']" position="after">-->
+<!--                <field name="dest_address_id" string="Deliver To" optional="show"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+<!--    <record id="purchase_order_view_tree_inherit_deliver_to" model="ir.ui.view">-->
+<!--        <field name="name">purchase.order.view.list.inherit.deliver.to</field>-->
+<!--        <field name="model">purchase.order</field>-->
+<!--        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='partner_id']" position="after">-->
+<!--                <field name="dest_address_id" string="Deliver To" optional="show"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="purchase_order_kpis_tree_inherit_deliver_to" model="ir.ui.view">
+        <field name="name">purchase.order.kpis.list.inherit.deliver.to</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="dest_address_id" string="Deliver To" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_filter_inherit_deliver_to" model="ir.ui.view">
+        <field name="name">purchase.order.search.inherit.deliver.to.rfq</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/field[@name='partner_id']" position="after">
+                <field name="dest_address_id" string="Deliver To"/>
+            </xpath>
+            <xpath expr="//search/filter[@name='my_purchases']" position="after">
+                <filter name="has_deliver_to" string="Has Deliver To" domain="[('dest_address_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_search_inherit_deliver_to" model="ir.ui.view">
+        <field name="name">purchase.order.search.inherit.deliver.to.po</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/field[@name='partner_id']" position="after">
+                <field name="dest_address_id" string="Deliver To"/>
+            </xpath>
+            <xpath expr="//search/filter[@name='my_Orders']" position="after">
+                <filter name="has_deliver_to" string="Has Deliver To" domain="[('dest_address_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
