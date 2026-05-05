@@ -1,0 +1,87 @@
+<odoo>
+    <template id="custom_purchase_report"
+              inherit_id="purchase.report_purchaseorder_document">
+        <xpath expr="//th[@name='th_quantity']" position="replace">
+            <th name="th_quantity" class="text-end">
+                Qty (<t t-esc="o.order_line and o.order_line[0].product_uom.name or ''"/>)
+            </th>
+        </xpath>
+
+        <xpath expr="//td[@class='text-end']/span[2]" position="replace"/>
+
+        <xpath expr="//th[contains(., 'Unit Price')]" position="replace">
+            <th class="text-end">
+                <span>Price</span>
+            </th>
+        </xpath>
+
+        <xpath expr="//table//thead//tr/th[3]" position="replace">
+            <th class="text-end">
+                <span>
+                    Price (
+                    <t t-esc="o.currency_id.name"/>
+                    -
+                    <t t-esc="o.currency_id.symbol"/>
+                    )
+                </span>
+            </th>
+        </xpath>
+
+
+        <xpath expr="//span[@t-field='line.price_subtotal']" position="replace">
+            <span t-esc="line.price_subtotal"/>
+        </xpath>
+
+        <xpath expr="//table//thead//tr/th[last()]" position="replace">
+            <th class="text-end">
+                <span>
+                    Amount (
+                    <t t-esc="o.currency_id.name"/>
+                    -
+                    <t t-esc="o.currency_id.symbol"/>
+                    )
+                </span>
+            </th>
+        </xpath>
+
+    </template>
+
+    <template id="custom_purchase_rfq_report"
+              inherit_id="purchase.report_purchasequotation_document">
+
+        <!-- ================= HEADER: DYNAMIC QTY (UOM) ================= -->
+        <xpath expr="//th[@name='th_quantity']" position="replace">
+
+            <th name="th_quantity" class="text-end">
+
+                <!-- Get first valid UOM -->
+                <t t-set="uom_name"
+                   t-value="o.order_line and o.order_line[0].product_uom.name or False"/>
+
+                Qty
+                <t t-if="uom_name">
+                    (<t t-esc="uom_name"/>)
+                </t>
+
+            </th>
+
+        </xpath>
+
+        <!-- ================= REMOVE UOM FROM LINE ================= -->
+        <xpath expr="//span[@t-field='order_line.product_uom']" position="replace">
+            <!-- Removed UOM completely -->
+        </xpath>
+
+    </template>
+
+
+    <template id="custom_purchase_tax_highlight"
+              inherit_id="purchase.document_tax_totals">
+        <xpath expr="//tr[contains(@class, 'o_taxes')]" position="attributes">
+            <attribute name="t-attf-style">
+                #{'background-color: #e6d9ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;' if o and o._name == 'purchase.order' else ''}
+            </attribute>
+        </xpath>
+
+    </template>
+</odoo>

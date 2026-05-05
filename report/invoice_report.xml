@@ -1,0 +1,112 @@
+<odoo>
+    <template id="custom_invoice_report"
+              inherit_id="account.report_invoice_document">
+        <xpath expr="//table[@name='invoice_line_table']" position="before">
+            <t t-set="is_custom_invoice_report"
+               t-value="not proforma and o.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+        </xpath>
+
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_priceunit']/span" position="replace">
+            <span t-if="is_custom_invoice_report">
+                Price (
+                <t t-esc="o.currency_id.name"/>
+                -<t t-esc="o.currency_id.symbol"/>)
+            </span>
+            <span t-else="">Unit Price</span>
+        </xpath>
+
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']/span" position="replace">
+            <span t-if="is_custom_invoice_report">
+                Amount (
+                <t t-esc="o.currency_id.name"/>
+                -<t t-esc="o.currency_id.symbol"/>)
+            </span>
+            <span t-else="">Amount</span>
+        </xpath>
+
+        <xpath expr="//table[@name='invoice_line_table']//td[@name='td_subtotal']/span" position="replace">
+            <span t-if="is_custom_invoice_report" class="text-nowrap" t-esc="line.price_subtotal"/>
+            <span t-else="" class="text-nowrap" t-field="line.price_subtotal">27.00</span>
+        </xpath>
+
+        <!-- ===================== QUANTITY HEADER FIX ===================== -->
+        <xpath expr="//table[@name='invoice_line_table']/thead/tr/th[@name='th_quantity']" position="replace">
+
+            <th name="th_quantity" class="text-end text-nowrap">
+
+                <!-- PROFORMA → ONLY Quantity -->
+                <t t-if="proforma">
+                    Quantity
+                </t>
+
+                <!-- NORMAL → Quantity (UOM) -->
+                <t t-else="">
+                    <t t-set="qty_lines"
+                       t-value="o.invoice_line_ids.filtered(lambda l: l.display_type == 'product' and l.product_id)"/>
+
+                    <t t-set="uom_name"
+                       t-value="qty_lines and qty_lines[0].product_uom_id.display_name or False"/>
+
+                    Quantity
+                    <t t-if="uom_name">
+                        (<t t-esc="uom_name"/>)
+                    </t>
+                </t>
+
+            </th>
+
+        </xpath>
+
+        <!-- ===================== REMOVE UOM IN PROFORMA ===================== -->
+        <xpath expr="//table[@name='invoice_line_table']//td[@name='td_quantity']/span[@t-field='line.product_uom_id']"
+               position="replace">
+
+            <!-- Show UOM ONLY if NOT proforma -->
+            <t t-if="not proforma">
+                <span t-field="line.product_uom_id" groups="uom.group_uom"/>
+            </t>
+
+        </xpath>
+
+    </template>
+
+    <template id="custom_invoice_tax_label"
+              inherit_id="account.document_tax_totals_template">
+        <xpath expr="//t[@t-foreach=&quot;subtotal['tax_groups']&quot;]" position="replace">
+            <t t-foreach="subtotal['tax_groups']" t-as="tax_group">
+                <tr class="o_taxes"
+                    t-att-style="'background-color: #e6d9ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;' if without_payment_report and not proforma else ''">
+                    <td style="max-width: 200px;">
+                        <span t-out="tax_group['group_name']">Tax 15%</span>
+                    </td>
+                    <td class="text-end o_price_total">
+                        <span class="text-nowrap"
+                              t-out="tax_group['tax_amount_currency']"
+                              t-options='{"widget": "monetary", "display_currency": currency}'>1.05
+                        </span>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="custom_invoice_tax_label_company_currency"
+              inherit_id="account.document_tax_totals_company_currency_template">
+        <xpath expr="//t[@t-foreach=&quot;subtotal['tax_groups']&quot;]" position="replace">
+            <t t-foreach="subtotal['tax_groups']" t-as="tax_group">
+                <tr class="o_taxes"
+                    t-att-style="'background-color: #e6d9ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;' if without_payment_report and not proforma else ''">
+                    <td style="max-width: 200px;">
+                        <span t-out="tax_group['group_name']">Tax 15%</span>
+                    </td>
+                    <td class="text-end o_price_total">
+                        <span class="text-nowrap"
+                              t-out="tax_group['tax_amount']"
+                              t-options='{"widget": "monetary", "display_currency": currency}'>1.05
+                        </span>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+</odoo>

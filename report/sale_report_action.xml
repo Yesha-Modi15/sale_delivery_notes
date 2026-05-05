@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Override default Sale Order / Quotation report -->
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+    <record id="sale.action_report_pro_forma_invoice" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+    <record id="sale_pdf_quote_builder.action_report_saleorder_raw" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+
+    <!-- Purchase Order -->
+    <record id="purchase.action_report_purchase_order" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+    <!-- RFQ -->
+    <record id="purchase.report_purchase_quotation" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+    <!-- Invoice without Payments -->
+    <record id="account.account_invoices_without_payment" model="ir.actions.report">
+        <field name="report_type">qweb-html</field>
+    </record>
+
+
+
+</odoo>
