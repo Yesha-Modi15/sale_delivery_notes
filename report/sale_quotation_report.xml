@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Use a custom external layout router only from Sale report document -->
-    <template id="report_saleorder_document_quotation_layout_switch" inherit_id="sale.report_saleorder_document">
-        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
-            <attribute name="t-call">sale_delivery_notes.external_layout_router_quotation</attribute>
-        </xpath>
-    </template>
 
     <!-- Inherit web.external_layout and branch only for quotation states -->
     <template id="external_layout_router_quotation" inherit_id="web.external_layout" primary="True">
@@ -17,6 +12,12 @@
             <t t-elif="company.external_report_layout_id" t-call="{{company.external_report_layout_id.sudo().key}}">
                 <t t-out="0"/>
             </t>
+        </xpath>
+    </template>
+
+    <template id="report_saleorder_document_quotation_layout_switch" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-call">sale_delivery_notes.external_layout_router_quotation</attribute>
         </xpath>
     </template>
 
