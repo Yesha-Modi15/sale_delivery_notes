@@ -3,7 +3,7 @@
 
     <!-- Override default Sale Order / Quotation report -->
     <record id="sale.action_report_saleorder" model="ir.actions.report">
-        <field name="report_type">qweb-html</field>
+        <field name="report_type">qweb-pdf</field>
     </record>
 
     <record id="sale.action_report_pro_forma_invoice" model="ir.actions.report">

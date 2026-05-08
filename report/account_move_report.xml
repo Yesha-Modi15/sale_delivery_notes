@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_custom_invoice_bill" model="ir.actions.report">
+        <field name="name">Custom Invoice / Bill Report</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">sale_delivery_notes.report_custom_invoice_bill</field>
+        <field name="report_file">sale_delivery_notes.report_custom_invoice_bill</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="domain" eval="[('move_type', 'in', ('out_invoice', 'in_invoice'))]"/>
+        <field name="paperformat_id" ref="sale_delivery_notes.paperformat_euro_tight"/>
+    </record>
+</odoo>

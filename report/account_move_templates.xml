@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_custom_invoice_bill">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <t t-if="o.move_type in ('out_invoice', 'in_invoice')">
+                    <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+
+                    <style>
+                        html,
+                        body {
+                        font-family: Arial, sans-serif !important;
+                        font-size: 13px;
+                        font-weight: 400 !important;
+                        color: #000;
+                        }
+
+                        table,
+                        tr,
+                        td,
+                        div,
+                        span,
+                        p {
+                        font-weight: 400 !important;
+                        }
+
+                        strong,
+                        b,
+                        th,
+                        h1,
+                        h2,
+                        h3,
+                        h4 {
+                        font-weight: 700 !important;
+                        }
+
+                        .page {
+                        padding-top: 0 !important;
+                        margin-top: 0 !important;
+                        }
+
+                        .header {
+                        margin-bottom: 0 !important;
+                        }
+
+                        .table-lines {
+                        width: 100%;
+                        margin-top: 20px;
+                        border-collapse: collapse;
+                        font-size: 15px; /* Bigger text */
+                        }
+
+                        .table-lines th {
+                        padding: 14px 10px; /* Bigger header */
+                        color: white !important;
+                        font-size: 15px;
+                        font-weight: 700 !important;
+                        }
+
+                        .table-lines td {
+                        padding: 12px 10px; /* Bigger rows */
+                        font-size: 14px;
+                        vertical-align: middle;
+                        }
+
+                        .payment-title {
+                        padding: 12px 15px;
+                        font-size: 18px;
+                        font-weight: 700 !important;
+                        border-radius: 4px;
+                        }
+
+                        .invoice-date-table td {
+                        font-size: 15px;
+                        padding: 12px !important;
+                        }
+
+                        .invoice-date-table strong {
+                        font-size: 15px;
+                        font-weight: 700 !important;
+                        }
+
+                    </style>
+                    <t t-set="lines_with_uom" t-value="o.invoice_line_ids.filtered(lambda l: l.product_uom_id)"/>
+                    <t t-set="uoms" t-value="lines_with_uom.mapped('product_uom_id')"/>
+                    <t t-set="has_mixed_uom" t-value="len(uoms) &gt; 1"/>
+
+                    <div class="header" style="width:100%;">
+
+                        <div class="row">
+
+                            <div class="col-12 text-end">
+                                <img t-if="o.company_id.logo"
+                                     t-att-src="image_data_uri(o.company_id.logo)"
+                                     style="max-height:70px; max-width:200px;"
+                                     alt="Company Logo"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ROW 2 — TITLE ONLY (CENTER) -->
+                    <div class="page">
+                        <div class="col-12 text-center m-0 p-0">
+                            <h2 style="
+                                        font-weight:bold;
+                                        margin:0;
+                                        padding:0;
+                                        font-size:40px;
+                                        line-height:1.1;
+                                        color: rgb(74, 139, 219);
+                                    ">
+                                <span t-if="o.move_type == 'out_invoice'">Customer Invoice</span>
+                                <span t-if="o.move_type == 'in_invoice'">Vendor Bill</span>
+                            </h2>
+                        </div>
+
+                        <!-- ROW 3 — ADDRESS & SEPARATOR -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-start" style="font-size:16px; line-height:1.8;">
+                                <div t-field="o.partner_id"
+                                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            </div>
+                        </div>
+
+                        <div class="pt-5">
+                            <hr style="border: 0; border-top: 2px solid rgb(74, 139, 219); opacity: 1; margin: 0;"/>
+                        </div>
+                        <!-- Increased top margin here using mt-5 -->
+                        <div class="row mb-4 pt-5" style="font-size:16px;">
+                            <div class="col-6 text-start">
+                                <div t-if="o.invoice_origin" class="text-nowrap">
+                                    <strong>Contract No:</strong>
+                                    <t t-esc="o.invoice_origin"/>
+                                </div>
+                            </div>
+
+                            <div class="col-6 text-end">
+                                <div class="text-nowrap">
+                                    <strong>Invoice Id:</strong>
+                                    <t t-esc="o.name"/>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- DATE SECTION — KEEP BORDERS -->
+                        <table class="invoice-date-table"
+                               style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-top: 10px; margin-bottom: 24px;">
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px;">
+                                    <strong>Invoice Date:</strong>
+                                    <span t-if="o.invoice_date" t-esc="o.invoice_date.strftime('%Y-%m-%d')"/>
+                                </td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">
+                                    <strong>Due Date:</strong>
+                                    <span t-if="o.invoice_date_due"
+                                          t-esc="o.invoice_date_due.strftime('%Y-%m-%d')"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px;">
+                                    <strong>Delivery Date:</strong>
+                                    <span t-if="o.invoice_date" t-esc="o.invoice_date.strftime('%Y-%m-%d')"/>
+                                </td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">
+                                    <strong>Accounting Date:</strong>
+                                    <span t-if="o.date" t-esc="o.date.strftime('%Y-%m-%d')"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- MAIN TABLE — ONLY HEADER BOTTOM BORDER -->
+                        <table class="table-lines table-borderless w-100">
+                            <thead class="bg-primary"
+                                   style="background-color: rgb(74, 139, 219) !important; color: white !important;">
+                                <tr>
+                                    <th class="text-center" style="color: white !important;">Description</th>
+                                    <th class="text-end text-nowrap" style="color: white !important;">
+                                        <t t-if="not has_mixed_uom">
+                                            Qty
+                                            <t t-if="uoms">
+                                                (<t t-esc="uoms[0].name"/>)
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            Qty
+                                        </t>
+                                    </th>
+                                    <th t-if="has_mixed_uom" class="text-start text-nowrap"
+                                        style="color: white !important;">
+                                        UoM
+                                    </th>
+                                    <th class="text-end text-nowrap" style="color: white !important;">
+                                        Price (<t t-esc="o.currency_id.symbol"/> <t t-esc="o.currency_id.name"/>)
+                                    </th>
+                                    <th class="text-center text-nowrap" style="color: white !important;">Taxes</th>
+                                    <th class="text-end text-nowrap" style="color: white !important;">
+                                        Amount (<t t-esc="o.currency_id.symbol"/> <t t-esc="o.currency_id.name"/>)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.invoice_line_ids" t-as="line"
+                                    t-att-style="line_index % 2 == 1 and 'background-color:rgb(127, 168, 218);' or ''">
+                                    <td class="text-start">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <t t-esc="line.quantity"/>
+                                    </td>
+                                    <td t-if="has_mixed_uom" class="text-start text-nowrap">
+                                        <span t-field="line.product_uom_id"/>
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <t t-esc="line.price_unit" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-esc="', '.join(line.tax_ids.mapped('name'))"/>
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <t t-esc="line.price_subtotal"
+                                           t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- TOTALS SECTION — NO BORDERS -->
+                        <div class="row mt-4 table-borderless">
+                            <div class="col-6"/>
+                            <div class="col-6">
+                                <table class="table-totals" style="width: 100%; font-size:16px; line-height: 1.4;">
+                                    <tr>
+                                        <td style="padding: 4px 4px;">
+                                            <strong>Untaxed Amount</strong>
+                                        </td>
+                                        <td style="padding: 4px 4px; text-align: right;">
+                                            <t t-esc="o.amount_untaxed"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 4px 4px;">
+                                            <strong>Tax</strong>
+                                        </td>
+                                        <td style="padding: 4px 4px; text-align: right;">
+                                            <t t-esc="o.amount_tax"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 4px 4px;">
+                                            <strong>Total</strong>
+                                        </td>
+                                        <td style="padding: 4px 4px; text-align: right; font-weight: bold;">
+                                            <t t-esc="o.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mt-4" style="page-break-inside: avoid;">
+                            <div class="bg-primary payment-title"
+                                 style="background-color: rgb(74, 139, 219) !important; color: white !important;">
+                                Payment Information
+                            </div>
+                            <div style="margin-top:10px; padding-top:10px; font-size:16px; line-height:2;">
+
+                                <div t-if="o.invoice_payment_term_id">
+                                    <span style="display:inline-block; width:180px; font-weight:700;">
+                                        Payment Terms:
+                                    </span>
+                                    <span t-esc="o.invoice_payment_term_id.name"/>
+                                </div>
+
+                                <div>
+                                    <span style="display:inline-block; width:180px; font-weight:700;">
+                                        Payment Method:
+                                    </span>
+                                    <span>Manual</span>
+                                </div>
+
+                                <div t-if="o.payment_reference">
+                                    <span style="display:inline-block; width:180px; font-weight:700;">
+                                        Payment Reference:
+                                    </span>
+                                    <span t-esc="o.payment_reference"/>
+                                </div>
+
+                                <div t-if="o.partner_bank_id">
+                                    <span style="display:inline-block; width:180px; font-weight:700;">
+                                        Recipient Bank:
+                                    </span>
+                                    <span t-esc="o.partner_bank_id.acc_number"/>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="mt-4 table-borderless" t-if="o.narration"
+                             style="page-break-inside: avoid; width:100%;">
+
+                            <table style="width:100%; font-size:14px; line-height:1.8;">
+                                <tr>
+                                    <td style="width:80px; white-space:nowrap;">
+                                        <strong style="font-weight:700;">Notes :</strong>
+                                    </td>
+                                    <td style="word-break:break-word;">
+                                        <span t-out="o.narration"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <div class="footer border-top">
+                        <div class="row pt-2 align-items-center text-nowrap">
+                            <div class="col-4 text-start">
+                                <span t-if="o.company_id.phone">
+                                    <i class="fa fa-phone"/>
+                                    <span class="ms-1" t-esc="o.company_id.phone"/>
+                                </span>
+                            </div>
+                            <div class="col-4 text-center">
+                                <span t-if="o.company_id.email">
+                                    <i class="fa fa-envelope"/>
+                                    <span class="ms-1" t-esc="o.company_id.email"/>
+                                </span>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span t-if="o.company_id.website">
+                                    <i class="fa fa-globe"/>
+                                    <span class="ms-1" t-esc="o.company_id.website"/>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12 text-center" style="font-size: 10px;">
+                                Page
+                                <span class="page"/>
+                                /
+                                <span class="topage"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
